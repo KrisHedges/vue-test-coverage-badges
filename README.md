@@ -1,4 +1,4 @@
-# Jest Coverage Badges
+#Vue Test Coverage Badges
 
 > Create a group of coverage badge
 
