@@ -1,6 +1,6 @@
 {
   "name": "vue-test-coverage-badges",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a group of coverage badges from vue-test-utils using direct links to sheilds.io badges in README",
   "main": "cli.js",
   "bin": "cli.js",
