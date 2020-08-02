@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /* eslint-disable semi */
-const mkdirp = require('mkdirp');
 const { get } = require('https');
 const { readFile, writeFile } = require('fs');
+const { exec } = require('child_process');
 
 /**
  * Will lookup the argument in the cli arguments list and will return a
@@ -77,27 +77,26 @@ const writeBadgeInFolder = (key, res) => {
 }
 
 const getBadgeByKey = report => (key) => {
-  const url = getBadge(report, key);
-
-  download(url, (err, res) => {
-    if (err) {
-      throw err;
-    }
-    mkdirp(outputPath, (folderError) => {
-      if (folderError) {
-        console.error(`Could not create output directory ${folderError}`);
-      } else {
-        writeBadgeInFolder(key, res);
-      }
-    })
-  })
+  const url = getBadge(report, key).replace(/\//g, '\\/').replace(/\:/g, '\\:').replace(/\%/g, '\\%').replace(/\-/g, '\\-');
+  let sedcmd = String.raw`sed -i .bak 's/https\:\/\/img.shields.io\/badge\/Coverage\:`+key+".*/" + url +")/g' README.md";
+  try {
+    exec(sedcmd);
+  } catch (ex) {
+    throw new Error(ex);
+  }
 }
 
 readFile(`${inputPath}`, 'utf8', (err, res) => {
   if (err) {
     throw err;
   }
-
   const report = JSON.parse(res);
   reportKeys.forEach(getBadgeByKey(report));
+
+  try {
+    exec("rm -rf README.md.bak");
+  } catch (ex) {
+    throw new Error(ex);
+  }
+  console.log("Test Coverage Badges in README.md Updated");
 });
